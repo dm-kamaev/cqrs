@@ -2,7 +2,8 @@
   "name": "@ignis-web/cqrs",
   "version": "1.0.0",
   "description": "Library for CQRS",
-  "main": "index.js",
+  "types": "dist/index.d.ts",
+  "main": "dist/index.js",
   "directories": {
     "example": "example"
   },
