@@ -8,7 +8,7 @@ Example:
 ```ts
 import Bus, { ICommand, IQuery, ICommandHandler, IQueryHandler } from '@ignis-web/cqrs';
 
-interface ICreateCommand extends ICommand<{ name: string }> { };
+interface ICreateCommand extends ICommand<{ id: number; name: string }> { };
 
 class CreateCommand implements ICreateCommand {
   public readonly __tag = 'command:create';
@@ -58,5 +58,5 @@ class GetByIdHandler implements IQueryHandler<IGetByIdQuery> {
 const bus = new Bus([ new CreateHandler(), new GetByIdHandler() ]);
 
 await bus.exec(new CreateCommand({ id: 123, name: 'John' }));
-const user = await bus.exec(new GetByIdHandler(123)); // { id: 123, name: 'John' }
+const user = await bus.exec(new GetByIdQuery(123)); // { id: 123, name: 'John' }
 ```
