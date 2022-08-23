@@ -49,14 +49,17 @@ class GetByIdHandler implements IQueryHandler<IGetByIdQuery> {
 
   async exec(command: IGetByIdQuery) {
     return {
-      id: 123,
+      id: command.id,
       name: 'John',
     };
   }
 }
 
-const bus = new Bus([ new CreateHandler(), new GetByIdHandler() ]);
+const bus = new Bus([new CreateHandler(), new GetByIdHandler()]);
 
-await bus.exec(new CreateCommand({ id: 123, name: 'John' }));
-const user = await bus.exec(new GetByIdQuery(123)); // { id: 123, name: 'John' }
+void async function () {
+  await bus.exec(new CreateCommand({ id: 123, name: 'John' }));
+  // { id: 123, name: 'John' }
+  const user = await bus.exec(new GetByIdQuery(123));
+}();
 ```
