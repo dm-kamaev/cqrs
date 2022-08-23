@@ -1,5 +1,5 @@
 {
-  "name": "cqrs",
+  "name": "@ignis-web/cqrs",
   "version": "1.0.0",
   "description": "Library for CQRS",
   "main": "index.js",

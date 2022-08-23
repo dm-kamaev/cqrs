@@ -10,6 +10,5 @@ jobs:
         with:
           node-version: '14'
       - run: npm i -D
-      - run: make check_correctness
-      - run: make run build
+      - run: make check_correctness build
       - run: echo "🍏 This job's status is ${{ job.status }}."
