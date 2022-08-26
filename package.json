@@ -1,6 +1,6 @@
 {
   "name": "@ignis-web/cqrs",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Library for CQRS",
   "types": "dist/index.d.ts",
   "main": "dist/index.js",
@@ -24,7 +24,8 @@
     "typescript": "4.6.4"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublishOnly": "make build"
   },
   "keywords": [
     "cqrs",
