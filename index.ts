@@ -43,7 +43,7 @@ export interface IQueryHandler<Command extends ICommand<any> = ICommand<any>> ex
   exec: (command: Command) => Promise<any>;
 }
 
-type IHandler<T = ICommand<any>> = ICommandHandler<T> | IQueryHandler<T>;
+type IHandler<T = ICommand<any>> = ICommandHandler<T, any> | IQueryHandler<T>;
 
 type Result<RegisteredHandlers extends IHandler[], Command extends ICommand<any>> = ReturnType<Extract<RegisteredHandlers[number], { exec: (cmd: Command) => any }>['exec']>;
 
