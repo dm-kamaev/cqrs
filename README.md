@@ -8,7 +8,7 @@ Example:
 ```ts
 import Bus, { ICommand, IQuery, ICommandHandler, IQueryHandler } from '@ignis-web/cqrs';
 
-interface ICreateCommand extends ICommand<{ id: number; name: string }> { };
+interface ICreateCommand extends ICommand<{ __tag: 'command:create'; id: number; name: string }> { };
 
 class CreateCommand implements ICreateCommand {
   public readonly __tag = 'command:create';
@@ -21,7 +21,7 @@ class CreateCommand implements ICreateCommand {
   }
 }
 
-interface IGetByIdQuery extends IQuery<{ id: number }> { };
+interface IGetByIdQuery extends IQuery<{ __tag: 'query:get-by-id'; id: number }> { };
 
 class GetByIdQuery implements IGetByIdQuery {
   public readonly __tag = 'query:get-by-id';
