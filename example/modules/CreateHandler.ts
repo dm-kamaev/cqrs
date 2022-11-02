@@ -1,12 +1,11 @@
-import { ICommandHandler, IBus } from '../../index';;
+import { ICommandHandler } from '../../index';;
 import { ICreateCommand } from './CreateCommand';
-import GetByIdQuery from './GetByIdQuery';
-import GetByIdHandler from './GetByIdHandler';
 
 
-export default class CreateHandler implements ICommandHandler<ICreateCommand> {
+export default class CreateHandler implements ICommandHandler<ICreateCommand, number> {
   public readonly __tag = 'command:create';
-  public bus: IBus<GetByIdHandler[]>;
+  test: number;
+
 
   // async validate(command: ICreateCommand) {
   //   if (command.name !== 'Vasya') {
@@ -15,11 +14,12 @@ export default class CreateHandler implements ICommandHandler<ICreateCommand> {
   // }
 
   async exec(command: ICreateCommand) {
-    const result = await this.bus.exec(new GetByIdQuery());
-    console.log('CreateHandler', {
+    this.test = Math.random();
+    console.log('create', {
       user_id: 123,
       name: command.name,
-    }, result);
+    });
+    return 25;
   }
 
 }

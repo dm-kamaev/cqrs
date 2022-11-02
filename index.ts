@@ -43,11 +43,13 @@ export interface IQueryHandler<Command extends ICommand<any> = ICommand<any>> ex
   exec: (command: Command) => Promise<any>;
 }
 
-type IHandler<T = ICommand<any>> = ICommandHandler<T, any> | IQueryHandler<T>;
+type IHandler<T = ICommand<any>> = () => ICommandHandler<T, any> | IQueryHandler<T>;
 
-type Result<RegisteredHandlers extends IHandler[], Command extends ICommand<any>> = ReturnType<Extract<RegisteredHandlers[number], { exec: (cmd: Command) => any }>['exec']>;
+type Result<RegisteredHandlers extends IHandler[], Command extends ICommand<any>> = ReturnType<
+  ReturnType<Extract<RegisteredHandlers[number], () => { exec: (cmd: Command) => any }>>['exec']
+>
 
-export interface IBus<RegisteredHandlers extends IHandler[] = ICommandHandler<any>[]> {
+export interface IBus<RegisteredHandlers extends IHandler[] = Array<() => ICommandHandler<any>>> {
   exec<CommandOrQuery extends IC | IQ = any>(
     // eslint-disable-next-line no-unused-vars
     input: CommandOrQuery,
@@ -55,28 +57,29 @@ export interface IBus<RegisteredHandlers extends IHandler[] = ICommandHandler<an
 }
 
 // export class CommandBus<TRegisteredCommandHandlers extends ICommandHandler[] = ICommandHandler<any>[]> {
-export default class Bus<RegisteredHandlers extends IHandler[] = ICommandHandler<any>[]> implements IBus<RegisteredHandlers> {
-  private readonly _handlers: Record<string, RegisteredHandlers[number]>;
+export default class Bus<RegisteredHandlers extends IHandler[] = Array<() => ICommandHandler<any>>> implements IBus<RegisteredHandlers> {
+  private readonly _fabricHandlers: Record<string, RegisteredHandlers[number]>;
 
   constructor(handlers: RegisteredHandlers) {
-    this._handlers = {};
+    this._fabricHandlers = {};
 
-    handlers.forEach(handler => {
+    handlers.forEach(fabric => {
+      const handler = fabric();
       const tag = handler.__tag;
-      if (this._handlers[tag]) {
+      if (this._fabricHandlers[tag]) {
         throw new HandlerDuplicateError(`Handler already exist with name ${tag}`);
       }
-      handler.bus = this;
-      this._handlers[tag] = handler;
+
+      this._fabricHandlers[tag] = fabric;
     });
   }
-  // TCommand extends ICommand<any> = any
+
   async exec<CommandOrQuery extends IC | IQ = any>(
     input: CommandOrQuery,
   ): Promise<Result<RegisteredHandlers, CommandOrQuery>> {
-    const [type, name] = input.__tag.split(':');
-    const handler = this._handlers[input.__tag];
-    if (!handler) {
+    const fabric = this._fabricHandlers[input.__tag];
+    if (!fabric) {
+      const [type, name] = input.__tag.split(':');
       if (isType(type)) {
         this._commandOrQueryNotFound(type, name);
       } else {
@@ -99,6 +102,7 @@ export default class Bus<RegisteredHandlers extends IHandler[] = ICommandHandler
       await input.build();
     }
 
+    const handler = fabric();
     if (handler.validate) {
       await handler.validate(input);
     }

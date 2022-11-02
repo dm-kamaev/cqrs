@@ -2,7 +2,7 @@ import { IQueryHandler } from '../../index';
 import { IGetByNameQuery } from './GetByNameQuery';
 
 export default class GetByNameHandler implements IQueryHandler<IGetByNameQuery> {
-  public readonly __tag = 'query:get-by-id';
+  public readonly __tag = 'query:get-by-name';
 
   async exec(command: IGetByNameQuery) {
 
