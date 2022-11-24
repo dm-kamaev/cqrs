@@ -2,7 +2,7 @@
 
 [![Actions Status](https://github.com/dm-kamaev/cqrs/workflows/Build/badge.svg)](https://github.com/dm-kamaev/cqrs/actions)
 
-Library for realization CQRS in your applicaton.
+Library for realization of CQRS in your applicaton.
 
 ```sh
 npm i @ignis-web/cqrs -S
@@ -69,7 +69,7 @@ void async function () {
 ```
 
 ### Command may return value
-Often we need what to handler of command return result of operation. For example, id of entity or status of operation. For this you can pass second argument for `ICommandHandler` it's type for return value after executing.
+Often we need that handler of command return result of operation. For example, id of entity or status of operation. For this you can pass second argument to `ICommandHandler`, it's type of returned value.
 ```ts
 class CreateHandler implements ICommandHandler<ICreateCommand, number> {
   public readonly __tag = 'command:create';
@@ -88,7 +88,7 @@ class CreateHandler implements ICommandHandler<ICreateCommand, number> {
 
 
 ### Validation
-You can use method `validate` for validation input data in command or query:
+You can use method `validate` for validation of input data in command or query:
 ```ts
 class CreateCommand implements ICreateCommand {
   public readonly __tag = 'command:create';
@@ -103,9 +103,9 @@ class CreateCommand implements ICreateCommand {
 
 }
 ```
-Method `validate` is asyncronous and called after `constructor`.
+The method `validate` is asyncronous and called after `constructor`.
 
-It's available in handler of command/query. Command or query is passed as first argument:
+It's also available in handler of command/query. Command or query is passed as the first argument:
 ```ts
 class CreateHandler implements ICommandHandler<ICreateCommand> {
   public readonly __tag = 'command:create';
@@ -126,7 +126,7 @@ class CreateHandler implements ICommandHandler<ICreateCommand> {
 ```
 
 ### Async build command/query
-TypeScript can't support asyncronous constructor for class but sometimes you may be want execute asyncronous actions for building command/query. Method `build` comes to rescue:
+TypeScript can't support asyncronous constructor for class but sometimes you may be want to execute asyncronous actions for building command/query. The method `build` comes to rescue:
 ```ts
 class CreateCommand implements ICreateCommand {
   public readonly __tag = 'command:create';
@@ -147,7 +147,7 @@ It's asyncronous and called after `validate`.
 
 ### Middlewares
 You can use concept of middleware in command/query.
-First variant, it's override method `middlewares` which must return array of functions:
+The first variant is to override method `middlewares` which must return array of functions:
 ```ts
 class CreateCommand implements ICreateCommand {
   public readonly __tag = 'command:create';
@@ -177,7 +177,7 @@ class CreateCommand implements ICreateCommand {
 }
 ```
 
-Second variant, it's create  property `middlewares` which be array of functions:
+The second variant is to create property `middlewares` which be array of functions:
 ```ts
 class CreateCommand implements ICreateCommand {
   public readonly __tag = 'command:create';
@@ -204,4 +204,4 @@ class CreateCommand implements ICreateCommand {
   }
 }
 ```
-Middlewares calls before `validate` and `build`.
+Middlewares are called before methods `validate` and `build`.
