@@ -8,17 +8,9 @@ interface BaseAction {
   build?: () => Promise<any>;
 }
 
-interface Action<Payload> extends BaseAction {
+export interface Action<T> extends BaseAction {
   __tag: ActionName;
-  payload: Payload;
-}
-
-export interface IQuery<Name extends string, Payload> extends Action<Payload> {
-  __tag: `query:${Name}`;
-}
-
-export interface ICommand<Name extends string, Payload> extends Action<Payload> {
-  __tag: `command:${Name}`;
+  payload: T;
 }
 
 interface BaseHandler<Action> {
@@ -27,29 +19,26 @@ interface BaseHandler<Action> {
   afterExec?: () => Promise<void>;
 }
 
-interface ActionHandler<TAction extends Action<any> = Action<any>, Output = void> extends BaseHandler<TAction> {
+export interface ActionHandler<T extends Action<any> = Action<any>, Output = void> extends BaseHandler<T> {
   __tag: ActionName;
-  exec: (action: TAction) => Promise<Output>;
+  exec: (action: T) => Promise<Output>;
 }
 
-export interface IQueryHandler<TAction extends Action<any> = Action<any>, Output = void> extends ActionHandler<TAction, Output> {
-  __tag: `${TAction['__tag']}`;
-  exec: (action: TAction) => Promise<Output>;
-}
-
-export interface ICommandHandler<TAction extends Action<any> = Action<any>, Output = void> extends ActionHandler<TAction, Output> {
-  __tag: `${TAction['__tag']}`;
-  exec: (action: TAction) => Promise<Output>;
-}
-
+// type Handler<A extends Action<any>, B> = ActionHandler<A, B>;
 type Handler<A extends Action<any>, B> = () => ActionHandler<A, B>;
 
-
+// export interface IBus<TRegisteredCommandHandlers extends ActionHandler<any, any>[] = ActionHandler<any, any>[]> {
 export interface IBus<TRegisteredCommandHandlers extends Handler<any, any>[] = Handler<any, any>[], HashAction extends Record<string, Record<string, (...arg: any[]) => Action<any> >> = any> {
   readonly action: HashAction;
   exec<TCommand extends Action<any> = any>(action: TCommand): ResultOf<TRegisteredCommandHandlers, TCommand>
 }
 
+// type ResultOf<TRegisteredCommandHandlers extends ActionHandler[], TCommand extends Action<any>> = Promise<
+// type ResultOf<TRegisteredCommandHandlers extends Handler<any, any>[], TCommand extends Action<any>> = Promise<
+//   ReturnType<
+//     Extract<TRegisteredCommandHandlers[number], { exec: (cmd: TCommand) => any }>['exec']
+//   >
+// >;
 
 type ResultOf<TRegisteredCommandHandlers extends Handler<any, any>[], TCommand extends Action<any>> = Promise<
   ReturnType<
