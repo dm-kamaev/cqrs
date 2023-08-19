@@ -1,7 +1,6 @@
 
-// import product from './modules3/product';
 import { bus as _bus, provider as _provider } from './cqrs'
-import { IBus, IProvider } from './type';
+import { IBus as ICQBus, IProvider } from './type';
 
 void async function () {
   {
@@ -21,7 +20,7 @@ void async function () {
   }
 
   // {
-  //   const bus: IBus = _bus;
+  //   const bus: ICQBus = _bus;
 
   //   const { id: orderId } = await bus.exec(bus.action.order.create([{ product_id: 1, quantity: 50 }, { product_id: 3, quantity: 50 }]));
   //   //      ^?
