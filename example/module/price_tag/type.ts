@@ -1,4 +1,4 @@
-import { IQuery, ICommand, IQueryHandler, ICommandHandler } from '../../..';
+import { IQuery, ICommand, IQueryHandler, ICommandHandler } from '../../../dist';
 
 export interface ICreateBatchCommand extends ICommand<'price_tag__create_batch', { name: string; product_ids: number[] }[]> {};
 export interface ICreateBatchHandler extends ICommandHandler<ICreateBatchCommand, { ids: number[]; }> {};

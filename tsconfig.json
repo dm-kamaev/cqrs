@@ -16,7 +16,7 @@
     "allowJs": false,
     "declaration": true,
     "sourceMap": true,
-    "outDir": "dist/",
+    "outDir": "dist",
   },
   "exclude": [
     "node_modules",

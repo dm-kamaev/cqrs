@@ -44,61 +44,42 @@ export interface ICommandHandler<TAction extends Action<any> = Action<any>, Outp
 
 type Handler<A extends Action<any>, B> = () => ActionHandler<A, B>;
 
-export interface IBus<HashModule extends Record<string, Record<string, { action: (...arg: any[]) => Action<any>, handler: Handler<any, any> }>> = Record<string, Record<string, any>>> {
-  readonly action: ExtractActions<HashModule>;
-  exec<TCommand extends Action<any> = any>(action: TCommand): Promise<ResultOf<ExtractHandlers<HashModule>, TCommand>>
+
+export interface IBus<TRegisteredCommandHandlers extends Handler<any, any>[] = Handler<any, any>[], HashAction extends Record<string, Record<string, (...arg: any[]) => Action<any> >> = any> {
+  readonly action: HashAction;
+  exec<TCommand extends Action<any> = any>(action: TCommand): Promise<ResultOf<TRegisteredCommandHandlers, TCommand>>
 }
 
-type ResultOf<TRegisteredCommandHandlers extends Handler<any, any>, TCommand extends Action<any>> = Awaited<
+
+export type ResultOf<TRegisteredCommandHandlers extends Handler<any, any>[], TCommand extends Action<any>> =
   ReturnType<
     ReturnType<
-      Extract<TRegisteredCommandHandlers, (...arg: any[]) => { exec: (cmd: TCommand) => Promise<any> }>
+      Extract<TRegisteredCommandHandlers[number], (...arg: any[]) => { exec: (cmd: TCommand) => any }>
     >['exec']
-  >>;
+  >;
 
-type ExtractHandlers<HashModule extends Record<string, Record<string, { action: (...arg: any[]) => Action<any>, handler: Handler<any, any> }>>> =
-  HashModule extends Record<string, Record<string, infer R>> ?
-    R extends { action: (...arg: any[]) => Action<any>, handler: Handler<any, any> } ? R['handler'] : never
-  : never;
-
-type ExtractActions<HashModule extends Record<string, Record<string, { action: (...arg: any[]) => Action<any>, handler: Handler<any, any> }>>> = {
-  [K in keyof HashModule]: {
-    [SUBK in keyof HashModule[K]]: HashModule[K][SUBK]['action']
-  }
-}
-
-export type ResultOfAction<THashModule extends Record<string, Record<string, { action: (...arg: any[]) => Action<any>, handler: Handler<any, any> }>>, TAction extends Action<any> = any> = Promise<
-  ResultOf<ExtractHandlers<THashModule>, TAction>
->
-
+// export default class Bus<RegisteredHandlers extends ActionHandler<any, any>[] = ActionHandler<any, any>[]> implements IBus<RegisteredHandlers> {
 export default class Bus<
-  HashModule extends Record<string, Record<string, { action: (...arg: any[]) => Action<any>, handler: Handler<any, any> }>> = Record<string, Record<string, any>>
-> implements IBus<HashModule> {
-  action: ExtractActions<HashModule> = {} as ExtractActions<HashModule>;
-  private readonly _fabricHandlers: Record<string, Handler<any, any>>;
+  RegisteredHandlers extends Handler<any, any>[] = Handler<any, any>[],
+  HashAction extends Record<string, Record<string, (...arg: any[]) => Action<any>>> = Record<string, Record<string, any>>
+> implements IBus<RegisteredHandlers, HashAction> {
+  private readonly _fabricHandlers: Record<string, RegisteredHandlers[number]>;
 
-  constructor(hashModule: HashModule) {
+  constructor(public readonly action: HashAction, handlers: RegisteredHandlers) {
     this._fabricHandlers = {};
 
-    (Object.entries(hashModule) as Array<[keyof HashModule, HashModule[keyof HashModule]]>).forEach(([ moduleName, hashAction ]) => {
-      if (!this.action[moduleName]) {
-        this.action[moduleName] = {} as ExtractActions<HashModule>[keyof ExtractActions<HashModule>];
+    handlers.forEach(fabric => {
+      const handler = fabric();
+      const tag = handler.__tag;
+      if (this._fabricHandlers[tag]) {
+        throw new HandlerDuplicateError(`Handler already exist with name ${tag}`);
       }
-      (Object.entries(hashAction) as Array<[keyof HashModule[keyof HashModule], { action: (...arg: any[]) => Action<any>, handler: Handler<any, any> }]>).forEach(([ actionName, actionAndHandler ]) => {
-        const handler = actionAndHandler.handler();
-        this.action[moduleName][actionName] = actionAndHandler.action;
-        const tag = handler.__tag;
-        if (this._fabricHandlers[tag]) {
-          throw new HandlerDuplicateError(`Handler already exist with name ${tag}`);
-        }
 
-        this._fabricHandlers[tag] = actionAndHandler.handler;
-      });
+      this._fabricHandlers[tag] = fabric;
     });
-
   }
 
-  async exec<TAction extends Action<any> = any>(action: TAction): Promise<ResultOf<ExtractHandlers<HashModule>, TAction>> {
+  async exec<TAction extends Action<any> = any>(action: TAction): Promise<ResultOf<RegisteredHandlers, TAction>> {
     const fabric = this._fabricHandlers[action.__tag];
     if (!fabric) {
       const [type, name] = action.__tag.split(':');

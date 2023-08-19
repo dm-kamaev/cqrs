@@ -1,10 +1,10 @@
 publish:
 	npm publish --access public
 
-check_correctness:
+check_ts:
 	npx tsc --noEmit
 
-build:
+build: check_ts
 	rm -rf dist;
 	npx tsc
 
