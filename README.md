@@ -4,6 +4,8 @@
 
 Library for realization of CQRS in your applicaton.
 
+This module is **deprecated**! Please use [mediator-r](https://www.npmjs.com/package/mediator-r) instead.
+
 ```sh
 npm i @ignis-web/cqrs -S
 ```

@@ -1,7 +1,8 @@
 {
   "name": "@ignis-web/cqrs",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Library for CQRS",
+  "deprecated": "This module is deprecated. Please use mediator-r instead.",
   "types": "dist/index.d.ts",
   "main": "dist/index.js",
   "directories": {
